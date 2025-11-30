@@ -1,0 +1,29 @@
+#!/bin/sh
+cd `dirname $0`
+
+#export
+
+rm -rf build
+
+cmake -H./ -Bbuild -G Ninja -DCMAKE_BUILD_TYPE=Release -DMAKE_TESTS=ON -DBOARD=OFF -DUSE_MAP=ON -DLANDSERVER_INTERNAL=ON -DINSTALL_RUNTIME_LIBS=ON -DINSTALL_RUNTIME_PATH=ON -DCMAKE_INSTALL_PREFIX=/usr -DPROJECTVERSION=$PRODUCT_VERSION_REL -DSDL2_INSTALL_LIBS_FORCE=ON "$@" || exit 1
+
+cmake --build build --target all || exit 1
+DESTDIR=out/client cmake --build build --target test || exit 1
+DESTDIR=out/client cmake --build build --target package || exit 1
+
+#AIR configuration
+#cmake -H./ -Bbuild -G Ninja -DCMAKE_BUILD_TYPE=Release -DMAKE_TESTS=OFF -DBOARD=OFF -DLANDCLIENT_PROFILE_GST=OFF -DUSE_MAP=ON -DLANDCLIENT_PROFILE_WEDDING=OFF -DLANDCLIENT_PROFILE_AIR=ON -DLANDCLIENT_PROFILE_CARGO_CHANNEL=ON -DLANDSERVER_INTERNAL=ON -DINSTALL_RUNTIME_LIBS=ON -DINSTALL_RUNTIME_PATH=ON -DCMAKE_INSTALL_PREFIX=/usr -DPROJECTVERSION=$PRODUCT_VERSION_REL "$@" || exit 1
+#DESTDIR=out/client_air cmake --build build --target all || exit 1
+#DESTDIR=out/client_air cmake --build build --target package || exit 1
+
+#Wedding configuration
+#cmake -H./ -Bbuild -G Ninja -DCMAKE_BUILD_TYPE=Release -DMAKE_TESTS=OFF -DBOARD=OFF -DLANDCLIENT_PROFILE_GST=OFF -DUSE_MAP=ON -DLANDCLIENT_PROFILE_WEDDING=ON -DLANDCLIENT_PROFILE_AIR=OFF -DLANDCLIENT_PROFILE_CARGO_CHANNEL=OFF -DLANDSERVER_INTERNAL=ON -DINSTALL_RUNTIME_LIBS=ON -DINSTALL_RUNTIME_PATH=ON -DCMAKE_INSTALL_PREFIX=/usr -DPROJECTVERSION=$PRODUCT_VERSION_REL "$@" || exit 1
+#DESTDIR=out/client_wedding cmake --build build --target all || exit 1
+#DESTDIR=out/client_wedding cmake --build build --target package || exit 1
+
+#GST configuration
+cmake -H./ -Bbuild -G Ninja -DCMAKE_BUILD_TYPE=Release -DMAKE_TESTS=OFF -DBOARD=OFF -DLANDCLIENT_PROFILE_GST=ON -DUSE_MAP=OFF -DLANDCLIENT_PROFILE_WEDDING=OFF -DLANDCLIENT_PROFILE_AIR=OFF -DLANDCLIENT_PROFILE_CARGO_CHANNEL=OFF -DLANDSERVER_INTERNAL=ON -DINSTALL_RUNTIME_LIBS=ON -DINSTALL_RUNTIME_PATH=ON -DCMAKE_INSTALL_PREFIX=/usr -DPROJECTVERSION=$PRODUCT_VERSION_REL -DSDL2_INSTALL_LIBS_FORCE=ON "$@" || exit 1
+DESTDIR=out/client_gst cmake --build build --target all || exit 1
+DESTDIR=out/client_gst cmake --build build --target package || exit 1
+
+exit 0

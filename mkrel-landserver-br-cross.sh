@@ -1,0 +1,6 @@
+#!/bin/sh
+
+#export
+cd `dirname $0`
+source ./mkrel-board-br-cross.sh -cmake_arg "-DPROJECT_NAME_LOW=landserver -DBOARD=OFF -DLAND=ON -DLANDSERVER_ONLY=ON -DLANDCLIENT_ONLY=OFF -DLANDFFMPEG=OFF -DLANDSERVER_CLIENTEAPI=OFF -DLANDSERVER_INTERNAL=OFF" ${@}
+

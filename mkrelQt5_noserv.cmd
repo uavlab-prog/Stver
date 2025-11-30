@@ -1,0 +1,66 @@
+@echo off
+
+pushd
+cd /d %~dp0
+
+set PATH=%PATH%;%~dp0redist\nsis
+
+cmake -E remove_directory build
+cmake -E make_directory  build
+
+cd build
+
+if DEFINED APPLICATION_NAME_TR (
+set APPLICATION_NAME_TR_DEF=-DCOMPILE_APP_NAME_TR=%APPLICATION_NAME_TR%
+) else (
+set APPLICATION_NAME_TR_DEF=
+)
+
+if DEFINED APPLICATION_NAME (
+set APPLICATION_NAME_DEF=-DCOMPILE_APP_NAME=%APPLICATION_NAME%
+) else (
+set APPLICATION_NAME_DEF=
+)
+
+if DEFINED ORGANIZATION_NAME_TR (
+set ORGANIZATION_NAME_TR_DEF=-DCOMPILE_ORG_NAME_TR=%ORGANIZATION_NAME_TR%
+) else (
+set ORGANIZATION_NAME_TR_DEF=
+)
+
+if DEFINED ORGANIZATION_NAME (
+set ORGANIZATION_NAME_DEF=-DORGANIZATION_NAME=%ORGANIZATION_NAME%
+) else (
+set ORGANIZATION_NAME_DEF=
+)
+
+cmake -E remove CMakeCache.txt
+
+cmake -G Ninja ../ -DNO_BACKTRACE=ON -DCMAKE_BUILD_TYPE=Release -DMAKE_TESTS=ON -DBOARD=OFF -DLANDCLIENT_ONLY=ON -DLANDSERVER_ONLY=ON -DLANDSERVER_INTERNAL=ON -DUSE_MAP=ON -DLANDFFMPEG=ON -DINSTALL_RUNTIME_LIBS=ON -DCREATE_BUNDLE=ON -DBASE_TCP_CLIENT=ON -D_SUPPORT_ThermoContour=ON -DCMAKE_INSTALL_PREFIX=./out/landclient_noserv -DPROJECTVERSION=%PRODUCT_VERSION_REL% %APPLICATION_NAME_TR_DEF% %ORGANIZATION_NAME_TR_DEF% %APPLICATION_NAME_DEF% %ORGANIZATION_NAME_DEF% || exit 1
+
+ninja all || exit 1
+
+ctest -V || exit 1
+
+
+IF DEFINED ONLY_REGULAR_PROFILE (
+echo %ONLY_REGULAR_PROFILE%
+echo Build only regular profile
+ninja install || exit 1
+ninja package || exit 1
+
+popd
+exit /B 0
+) else (
+echo %ONLY_REGULAR_PROFILE%
+echo Build all profiles
+
+ninja install || exit 1
+ninja package || exit 1
+
+)
+
+
+
+popd
+exit /B 0
